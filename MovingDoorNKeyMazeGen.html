@@ -29,6 +29,18 @@
 
 
 
+		/*
+			Parses the width and height from the canvas object, and then clears the entire canvas
+		*/
+		function clearCanvas(offset, canvas) {
+			ctx.fillStyle = "white";
+			width = parseInt(canvas.canvas.attributes.width.value)
+			height = parseInt(canvas.canvas.attributes.height.value)
+			for (let r = 0; r < height; r++)
+				for (let c = 0; c < width; c++)
+					canvas.clearRect(c, r, 1, 1);
+		}
+
 
 		function Maze(row, col) {
 			let endNotFound = true;
@@ -184,7 +196,6 @@
 					}
 				}
 			}
-			console.log(m);
 		}
 
 
@@ -469,9 +480,14 @@
 				}
 			}
 
+
 			let deletion = []
 			for (let [key, value] of keyMap) {
 				ctx.clearRect(value[1] * delta, value[0] * delta, delta, delta);
+				if (value[0] == locR && value[1] == locC) {
+					deletion.push(key)
+					gateCounter++;
+				}
 				keyMove(key);
 				if (value[0] == locR && value[1] == locC) {
 					deletion.push(key)
@@ -482,7 +498,6 @@
 			}
 
 			for (let i = 0; i < deletion.length; i++) {
-				eventDungeon();
 				ctx.fillStyle = "white";
 				ctx.fillRect(keyMap.get(deletion[i])[1] * delta, keyMap.get(deletion[i])[0] * delta, delta, delta);
 				keyMap.delete(deletion[i])
@@ -502,38 +517,8 @@
 			}
 		}
 
-		function eventDungeon(dif) {
-			// let color = []
-			// for (let i = 0; i < maze.length; i++)
-			// 	color[i] = new Array(maze[0].length);
-
-			// for (let i = 0; i < maze.length; i++)
-			// 	for (let j = 0; j < maze[0].length; j++)
-			// 		color[i][j] = ctx.getImageData(j * delta, i * delta, delta, delta);
-
-			// for (let r = 0; r < maze.length; r++)
-			// 	for (let c = 0; c < maze[0].length; c++)
-			// 		ctx.clearRect(c * delta, r * delta, delta, delta);
-
-			Dungeon(dif);
-
-			// for (let r = 0; r < maze.length; r++)
-			// 	for (let c = 0; c < maze[0].length; c++)
-			// 		ctx.clearRect(c * delta, r * delta, delta, delta);
-
-			// for (let i = 0; i < maze.length; i++)
-			// 	for (let j = 0; j < maze[0].length; j++)
-			// 		ctx.putImageData(color[i][j], j * delta, i * delta);
-		}
-		function Dungeon(dif) {
-			console.log("working")
-		}
-
 		function endingFound() {
-			ctx.fillStyle = "white";
-			for (let r = 0; r < maze.length; r++)
-				for (let c = 0; c < maze[0].length; c++)
-					ctx.clearRect(c * delta, r * delta, delta, delta);
+			clearCanvas(0, ctx)
 			ctx.fillStyle = "black";
 			delta = s / 30;
 			write("CONGRATS!/YOU FOUND /THE END!", ctx, delta);
