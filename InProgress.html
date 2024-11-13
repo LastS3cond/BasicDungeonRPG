@@ -672,7 +672,6 @@
             // 	for (let c = 0; c < maze[0].length; c++)
             // 		ctx.clearRect(c * delta, r * delta, delta, delta);
             clearCanvas(450, ctx2)
-            clearCanvas(450, ctx3)
             warriors = generateWarriors()
             amt = ""
             if (warriors.length === 1)
@@ -696,17 +695,20 @@
             let lastIdx = warriors.length - 1
             if (finished) {
                 clearCanvas(450, ctx2)
-                write(`You are finished battling. They have dropped some food, health, and magic /items, restoring all stats. Press any directional key to move.`.toUpperCase(), ctx2, 3);
-                write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
+                clearCanvas(450, ctx3)
+                clearCanvas(0, ctx4)
                 protag.hp = 100
                 protag.stam = 100
                 protag.mp = 100
+                write(`You are finished battling. They have dropped some food, health, and magic /items, restoring all stats. Press any directional key to move.`.toUpperCase(), ctx2, 3);
+                write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
                 document.removeEventListener("keydown", Dungeon)
                 document.addEventListener("keydown", move)
             }
             else if (!inCombat && key == "KeyE") {
                 clearCanvas(450, ctx3)
                 clearCanvas(450, ctx2)
+
                 write(`You have ${warriors.length} ${warriors[lastIdx].gender === "Unknown" ? "" : warriors[lastIdx].gender + " "}${warriors[lastIdx].race} ${warriors[lastIdx].clique}${warriors.length > 1 ? "s" : ""} left to kill!/Would you like to fight directly(1), surprise attack(2), or use magic(3)?`.toUpperCase(), ctx2, 3);
                 inCombat = true
                 write(`Enemy Stats:/HP: ${warriors[lastIdx].hp}    MP: ${warriors[lastIdx].mp}    STA: ${warriors[lastIdx].stam}/STR: ${warriors[lastIdx].str}    DEF: ${warriors[lastIdx].def}    SPD: ${warriors[lastIdx].spd}/AGL: ${warriors[lastIdx].agl}    INT: ${warriors[lastIdx].int}    MAG: ${warriors[lastIdx].mag}`.toUpperCase(), ctx3, 3);
@@ -763,29 +765,29 @@
                         }
                         break
                 }
-
-            }
-            warriors[lastIdx].hp = Math.max(warriors[lastIdx].hp, 0)
-            protag.hp = Math.max(protag.hp, 0)
-            clearCanvas(0, ctx3)
-            clearCanvas(0, ctx4)
-            write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
-            write(`Enemy Stats:/HP: ${warriors[lastIdx].hp}    MP: ${warriors[lastIdx].mp}    STA: ${warriors[lastIdx].stam}/STR: ${warriors[lastIdx].str}    DEF: ${warriors[lastIdx].def}    SPD: ${warriors[lastIdx].spd}/AGL: ${warriors[lastIdx].agl}    INT: ${warriors[lastIdx].int}    MAG: ${warriors[lastIdx].mag}`.toUpperCase(), ctx3, 3);
-            if (protag.hp <= 0) {
-                clearCanvas(450, ctx2)
-                write(`You have perished in your battle. Please refresh to play again.`.toUpperCase(), ctx2, 3);
-                document.removeEventListener("keydown", move)
-            }
-            if (warriors[lastIdx].hp <= 0) {
-                clearCanvas(450, ctx2)
-                write(`You have vanquished an enemy! Press E to continue.`.toUpperCase(), ctx2, 3);
-                warriors.pop()
-                inCombat = false
-                if (warriors.length == 0) {
-                    finished = true
-                    return
+                warriors[lastIdx].hp = Math.max(warriors[lastIdx].hp, 0)
+                protag.hp = Math.max(protag.hp, 0)
+                clearCanvas(0, ctx3)
+                clearCanvas(0, ctx4)
+                write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
+                write(`Enemy Stats:/HP: ${warriors[lastIdx].hp}    MP: ${warriors[lastIdx].mp}    STA: ${warriors[lastIdx].stam}/STR: ${warriors[lastIdx].str}    DEF: ${warriors[lastIdx].def}    SPD: ${warriors[lastIdx].spd}/AGL: ${warriors[lastIdx].agl}    INT: ${warriors[lastIdx].int}    MAG: ${warriors[lastIdx].mag}`.toUpperCase(), ctx3, 3);
+                if (protag.hp <= 0) {
+                    clearCanvas(450, ctx2)
+                    write(`You have perished in your battle. Please refresh to play again.`.toUpperCase(), ctx2, 3);
+                    document.removeEventListener("keydown", Dungeon)
+                }
+                if (warriors[lastIdx].hp <= 0) {
+                    clearCanvas(450, ctx2)
+                    write(`You have vanquished an enemy! Press E to continue.`.toUpperCase(), ctx2, 3);
+                    warriors.pop()
+                    inCombat = false
+                    if (warriors.length == 0) {
+                        finished = true
+                        return
+                    }
                 }
             }
+
 
         }
 
