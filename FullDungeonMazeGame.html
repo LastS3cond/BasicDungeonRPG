@@ -169,7 +169,7 @@
 
 
                 maze = mazeConversion(maze)
-                write("Collect all dark blue keys to unlock the dark red doors! Game is finished /when you find the red exit. Use WASD controls or arrow keys.".toUpperCase(), ctx2, 3);
+                write("Collect keys by defeating dark blue foes to unlock the dark red doors! Game/is finished when you find the red exit. Use WASD controls or arrow keys.".toUpperCase(), ctx2, 3);
                 document.removeEventListener("keydown", characterCreation)
                 document.addEventListener("keydown", move);
 
@@ -575,6 +575,9 @@
 
 
         function move(e) {
+            clearCanvas(450, ctx2)
+            write("Collect keys by defeating dark blue foes to unlock the dark red doors! Game/is finished when you find the red exit. Use WASD controls or arrow keys.".toUpperCase(), ctx2, 3);
+
             let key = e.code;
             let positionChange = false;
             if ((key == "ArrowUp" || key == "KeyW") && (maze[locR - 1][locC] == "-1" || maze[locR - 1][locC] == "-5" || maze[locR - 1][locC] == "-7")) {
@@ -637,8 +640,10 @@
                     ctx.fillRect(value[1] * delta, value[0] * delta, delta, delta);
                 }
 
-                for (let i = 0; i < deletion.length; i++) {
+                if (deletion.length > 0) {
                     eventDungeon();
+                }
+                for (let i = 0; i < deletion.length; i++) {
                     ctx.fillStyle = "white";
                     ctx.fillRect(keyMap.get(deletion[i])[1] * delta, keyMap.get(deletion[i])[0] * delta, delta, delta);
                     keyMap.delete(deletion[i])
@@ -646,11 +651,6 @@
                 ctx.fillStyle = "blue";
                 ctx.fillRect(locC * delta, locR * delta, delta, delta);
 
-                // if (maze[locR][locC] == -7) {
-                // 	maze[locR][locC] = -1;
-                // 	eventDungeon();
-                // 	gateCounter++;
-                // }
 
                 if (maze[locR][locC] == "-5") {
                     document.removeEventListener("keydown", move);
@@ -660,17 +660,6 @@
         }
 
         function eventDungeon(dif) {
-            // let color = []
-            // for (let i = 0; i < maze.length; i++)
-            // 	color[i] = new Array(maze[0].length);
-
-            // for (let i = 0; i < maze.length; i++)
-            // 	for (let j = 0; j < maze[0].length; j++)
-            // 		color[i][j] = ctx.getImageData(j * delta, i * delta, delta, delta);
-
-            // for (let r = 0; r < maze.length; r++)
-            // 	for (let c = 0; c < maze[0].length; c++)
-            // 		ctx.clearRect(c * delta, r * delta, delta, delta);
             clearCanvas(450, ctx2)
             warriors = generateWarriors()
             amt = ""
@@ -793,9 +782,13 @@
 
         function endingFound() {
             clearCanvas(0, ctx)
+            clearCanvas(0, ctx2)
+            clearCanvas(0, ctx3)
+            clearCanvas(0, ctx4)
             ctx.fillStyle = "black";
             delta = s / 30;
             write("CONGRATS!/YOU FOUND /THE END!", ctx, delta);
+            write(`This small game was made by Jaydon/Bingham, feel free to reach out/through the contact tab at /jaydonbingham.com`.toUpperCase(), ctx3, 3);
         }
     </script>
 </body>
