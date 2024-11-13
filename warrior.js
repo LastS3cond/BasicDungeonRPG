@@ -1,6 +1,6 @@
 function generateWarriors() {
 
-    amt = Math.floor(Math.random() * 7) + 1;
+    amt = Math.floor(Math.random() * 6) + 1;
     let d = 0;
     if (amt === 1)
         d = 3
@@ -20,8 +20,10 @@ function generateWarriors() {
             gender = "Female"
             break
         case 2:
-            gender = "NonBinary"
+            gender = "Unknown"
             break
+        default:
+            throw Error()
     }
     switch (race) {
         case 0:
@@ -45,6 +47,8 @@ function generateWarriors() {
         case 6:
             race = "Ogre"
             break
+        default:
+            throw Error()
     }
     switch (clique) {
         case 0:
@@ -68,6 +72,8 @@ function generateWarriors() {
         case 6:
             clique = "Assassin"
             break
+        default:
+            throw Error()
     }
     listOfWarriors = []
     for (let i = 0; i < amt; i++) {
@@ -222,7 +228,7 @@ class Warrior {
             this.int += statGen(3);
             this.mag += statGen(3);
         }
-        else if (this.gender === "NonBinary") {
+        else if (this.gender === "Unknown") {
             this.str += statGen(2);
             this.def += statGen(2);
             this.spd += statGen(2);

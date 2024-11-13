@@ -27,7 +27,8 @@
         canvasRight.width = s * 3.0 / 2; canvasRight.height = 150;
         write("Welcome to the maze game! This game consists of choosing /a character, traversing a maze, and dealing with events. / /Each stage of the game will be more thoroughly explained /as we enter each stage. Controls and instruction will /typically be found below, and this area will be reserved /for the game itself./ /Have fun!".toUpperCase(), ctx, 4);
         write("Press E to continue!".toUpperCase(), ctx2, 3);
-
+        var finished = false
+        var inCombat = false
         let firstScreen = secondScreen = thirdScreen = finished = false;
         let gender = race = clique = null;
 
@@ -80,7 +81,7 @@
                         break
                     case "Digit3":
                         secondScreen = true;
-                        gender = "NonBinary"
+                        gender = "Unknown"
                         break
                 }
                 if (secondScreen) {
@@ -164,11 +165,10 @@
                 clearCanvas(0, ctx)
                 clearCanvas(450, ctx2)
                 protag = new Warrior(gender, race, clique, 3)
-                write(`HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
+                write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
 
 
                 maze = mazeConversion(maze)
-                write("Dawg".toUpperCase(), ctx3, 3);
                 write("Collect all dark blue keys to unlock the dark red doors! Game is finished /when you find the red exit. Use WASD controls or arrow keys.".toUpperCase(), ctx2, 3);
                 document.removeEventListener("keydown", characterCreation)
                 document.addEventListener("keydown", move);
@@ -672,6 +672,7 @@
             // 	for (let c = 0; c < maze[0].length; c++)
             // 		ctx.clearRect(c * delta, r * delta, delta, delta);
             clearCanvas(450, ctx2)
+            clearCanvas(450, ctx3)
             warriors = generateWarriors()
             amt = ""
             if (warriors.length === 1)
@@ -682,29 +683,110 @@
                 amt = "trio of"
             else
                 amt = "band of"
-            write(`You have encountered a ${amt} /${warriors[0].gender === "NonBinary" ? "" : warriors[0].gender + " "}${warriors[0].race} ${warriors[0].clique}${warriors.length > 1 ? "s" : ""}!/Press E to interact!`.toUpperCase(), ctx3, 3);
-            console.log(protag)
-            console.log(warriors)
+            finished = false
+            write(`You have encountered a ${amt} /${warriors[0].gender === "Unknown" ? "" : warriors[0].gender + " "}${warriors[0].race} ${warriors[0].clique}${warriors.length > 1 ? "s" : ""}!/Press E to interact!`.toUpperCase(), ctx3, 3);
             document.removeEventListener("keydown", move)
             document.addEventListener("keydown", Dungeon)
-            //canvasTop.width = s * 3; canvasTop.height = 450;
-            // console.log(ctx2)
-            // console.log(canvasTop.width / delta)
-            // for (let r = 0; r < canvasTop.height / delta; r++) {
-            // 	console.log("New Row")
-            //	for (let c = 0; c < canvasTop.width / delta; c++) {
-            // 		console.log("New Column")
-            //		ctx.clearRect(c * delta, r * delta, delta, delta);
-            //	}
-            //}
-            // for (let i = 0; i < maze.length; i++)
-            // 	for (let j = 0; j < maze[0].length; j++)
-            // 		ctx.putImageData(color[i][j], j * delta, i * delta);
         }
+
+
+
         function Dungeon(e) {
             let key = e.code;
-            if (key == "KeyE")
-                console.log("working")
+            let lastIdx = warriors.length - 1
+            if (finished) {
+                clearCanvas(450, ctx2)
+                write(`You are finished battling. They have dropped some food, health, and magic /items, restoring all stats. Press any directional key to move.`.toUpperCase(), ctx2, 3);
+                write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
+                protag.hp = 100
+                protag.stam = 100
+                protag.mp = 100
+                document.removeEventListener("keydown", Dungeon)
+                document.addEventListener("keydown", move)
+            }
+            else if (!inCombat && key == "KeyE") {
+                clearCanvas(450, ctx3)
+                clearCanvas(450, ctx2)
+                write(`You have ${warriors.length} ${warriors[lastIdx].gender === "Unknown" ? "" : warriors[lastIdx].gender + " "}${warriors[lastIdx].race} ${warriors[lastIdx].clique}${warriors.length > 1 ? "s" : ""} left to kill!/Would you like to fight directly(1), surprise attack(2), or use magic(3)?`.toUpperCase(), ctx2, 3);
+                inCombat = true
+                write(`Enemy Stats:/HP: ${warriors[lastIdx].hp}    MP: ${warriors[lastIdx].mp}    STA: ${warriors[lastIdx].stam}/STR: ${warriors[lastIdx].str}    DEF: ${warriors[lastIdx].def}    SPD: ${warriors[lastIdx].spd}/AGL: ${warriors[lastIdx].agl}    INT: ${warriors[lastIdx].int}    MAG: ${warriors[lastIdx].mag}`.toUpperCase(), ctx3, 3);
+            }
+            else if (inCombat) {
+
+                switch (key) {
+                    case "Digit1":
+                        if (protag.spd >= warriors[lastIdx].spd) {
+                            warriors[lastIdx].hp -= Math.floor(protag.str * (1 - warriors[lastIdx].def * 0.01))
+                            if (warriors[lastIdx].hp <= 0) {
+                                break
+                            }
+                            protag.hp -= Math.floor(warriors[lastIdx].str * (1 - protag.def * 0.01))
+                        }
+                        else {
+                            protag.hp -= Math.floor(warriors[lastIdx].str * (1 - protag.def * 0.01))
+                            if (protag.hp <= 0) {
+                                break
+                            }
+                            warriors[lastIdx].hp -= Math.floor(protag.str * (1 - warriors[lastIdx].def * 0.01))
+                        }
+                        break
+                    case "Digit2":
+                        if (protag.spd >= warriors[lastIdx].spd) {
+                            warriors[lastIdx].hp -= Math.floor(protag.int * (1 - warriors[lastIdx].agl * 0.01))
+                            if (warriors[lastIdx].hp <= 0) {
+                                break
+                            }
+                            protag.hp -= Math.floor(warriors[lastIdx].int * (1 - protag.agl * 0.01))
+                        }
+                        else {
+                            protag.hp -= Math.floor(warriors[lastIdx].int * (1 - protag.agl * 0.01))
+                            if (protag.hp <= 0) {
+                                break
+                            }
+                            warriors[lastIdx].hp -= Math.floor(protag.int * (1 - warriors[lastIdx].agl * 0.01))
+                        }
+                        break
+                    case "Digit3":
+                        if (protag.spd >= warriors[lastIdx].spd) {
+                            warriors[lastIdx].hp -= Math.floor(protag.mag * (1 - warriors[lastIdx].def * 0.01))
+                            if (warriors[lastIdx].hp <= 0) {
+                                break
+                            }
+                            protag.hp -= Math.floor(warriors[lastIdx].mag * (1 - protag.def * 0.01))
+                        }
+                        else {
+                            protag.hp -= Math.floor(warriors[lastIdx].mag * (1 - protag.def * 0.01))
+                            if (protag.hp <= 0) {
+                                break
+                            }
+                            warriors[lastIdx].hp -= Math.floor(protag.mag * (1 - warriors[lastIdx].def * 0.01))
+                        }
+                        break
+                }
+
+            }
+            warriors[lastIdx].hp = Math.max(warriors[lastIdx].hp, 0)
+            protag.hp = Math.max(protag.hp, 0)
+            clearCanvas(0, ctx3)
+            clearCanvas(0, ctx4)
+            write(`Your Stats:/HP: ${protag.hp}    MP: ${protag.mp}    STA: ${protag.stam}/STR: ${protag.str}    DEF: ${protag.def}    SPD: ${protag.spd}/AGL: ${protag.agl}    INT: ${protag.int}    MAG: ${protag.mag}`.toUpperCase(), ctx4, 3);
+            write(`Enemy Stats:/HP: ${warriors[lastIdx].hp}    MP: ${warriors[lastIdx].mp}    STA: ${warriors[lastIdx].stam}/STR: ${warriors[lastIdx].str}    DEF: ${warriors[lastIdx].def}    SPD: ${warriors[lastIdx].spd}/AGL: ${warriors[lastIdx].agl}    INT: ${warriors[lastIdx].int}    MAG: ${warriors[lastIdx].mag}`.toUpperCase(), ctx3, 3);
+            if (protag.hp <= 0) {
+                clearCanvas(450, ctx2)
+                write(`You have perished in your battle. Please refresh to play again.`.toUpperCase(), ctx2, 3);
+                document.removeEventListener("keydown", move)
+            }
+            if (warriors[lastIdx].hp <= 0) {
+                clearCanvas(450, ctx2)
+                write(`You have vanquished an enemy! Press E to continue.`.toUpperCase(), ctx2, 3);
+                warriors.pop()
+                inCombat = false
+                if (warriors.length == 0) {
+                    finished = true
+                    return
+                }
+            }
+
         }
 
         function endingFound() {
